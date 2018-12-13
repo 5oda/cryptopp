@@ -120,17 +120,27 @@ void ChaCha_Policy::CipherSetKey(const NameValuePairs &params, const byte *key, 
 void ChaCha_Policy::CipherResynchronize(byte *keystreamBuffer, const byte *IV, size_t length)
 {
     CRYPTOPP_UNUSED(keystreamBuffer), CRYPTOPP_UNUSED(length);
+#ifdef CRYPTOPP_RFC7539
+    CRYPTOPP_ASSERT(length==12);
+
+    GetBlock<word32, LittleEndian> get(IV);
+    m_state[12] = 0;
+    get(m_state[13])(m_state[14])(m_state[15]);
+#else
     CRYPTOPP_ASSERT(length==8);
 
     GetBlock<word32, LittleEndian> get(IV);
     m_state[12] = m_state[13] = 0;
     get(m_state[14])(m_state[15]);
+#endif
 }
 
 void ChaCha_Policy::SeekToIteration(lword iterationCount)
 {
     m_state[12] = (word32)iterationCount;  // low word
+#ifndef CRYPTOPP_RFC7539
     m_state[13] = (word32)SafeRightShift<32>(iterationCount);
+#endif
 }
 
 unsigned int ChaCha_Policy::GetAlignment() const
@@ -313,8 +323,10 @@ void ChaCha_Policy::OperateKeystream(KeystreamOperation operation,
 
             CRYPTOPP_KEYSTREAM_OUTPUT_SWITCH(CHACHA_OUTPUT, BYTES_PER_ITERATION);
 
+#ifndef CRYPTOPP_RFC7539
             if (++m_state[12] == 0)
                 m_state[13]++;
+#endif
         }
 
     // We may re-enter a SIMD keystream operation from here.

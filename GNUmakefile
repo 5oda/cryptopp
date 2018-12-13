@@ -1022,6 +1022,16 @@ SOLIB_FLAGS=-Wl,-h,libcryptopp.so$(SOLIB_COMPAT_SUFFIX)
 endif
 endif # HAS_SOLIB_VERSION
 
+# ChaCha20 according to RFC7539
+ifeq ($(CRYPTOPP_RFC7539),1)
+  ifeq ($(IS_LINUX),1)
+    CXXFLAGS += -DCRYPTOPP_RFC7539
+  endif
+  ifeq ($(IS_CYGWIN)$(IS_MINGW),11)
+    CXXFLAGS += /DCRYPTOPP_RFC7539
+  endif
+endif
+
 ###########################################################
 #####                Temp file cleanup                #####
 ###########################################################

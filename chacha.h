@@ -21,7 +21,11 @@ NAMESPACE_BEGIN(CryptoPP)
 
 /// \brief ChaCha stream cipher information
 /// \since Crypto++ 5.6.4
+#ifdef CRYPTOPP_RFC7539
+struct ChaCha_Info : public VariableKeyLength<32, 16, 32, 16, SimpleKeyingInterface::UNIQUE_IV, 12>
+#else
 struct ChaCha_Info : public VariableKeyLength<32, 16, 32, 16, SimpleKeyingInterface::UNIQUE_IV, 8>
+#endif
 {
     /// \brief The algorithm name
     /// \returns the algorithm name

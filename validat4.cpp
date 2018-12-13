@@ -1739,8 +1739,11 @@ bool ValidateSalsa()
 bool ValidateChaCha()
 {
 	std::cout << "\nChaCha validation suite running...\n";
-
+#ifdef CRYPTOPP_RFC7539
+	return RunTestDataFile("TestVectors/chacha-rfc7539.txt");
+#else
 	return RunTestDataFile("TestVectors/chacha.txt");
+#endif
 }
 
 bool ValidateSosemanuk()
